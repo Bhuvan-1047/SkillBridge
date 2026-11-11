@@ -1,0 +1,24 @@
+{
+  "name": "skillbridge-platform",
+  "version": "1.0.0",
+  "description": "SkillBridge - Student-to-Student Peer Skill Exchange Platform",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node run.js",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "seed": "npm run seed --prefix server"
+  },
+  "keywords": [
+    "skillswap",
+    "mern",
+    "peer-learning",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "SkillSwap Team",
+  "license": "ISC"
+}
