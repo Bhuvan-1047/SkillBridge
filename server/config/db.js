@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 let mongodInstance = null;
 
 const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
   const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/skillswap';
 
   try {
@@ -12,6 +16,11 @@ const connectDB = async () => {
     });
     return conn;
   } catch (err) {
+    if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+      console.error('Database connection failed. Please ensure MONGODB_URI is configured in Vercel environment variables:', err.message);
+      throw err;
+    }
+
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
       mongodInstance = await MongoMemoryServer.create({

@@ -24,14 +24,38 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Health check endpoints
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({
     status: 'online',
     platform: 'SkillBridge API',
     uptime: process.uptime(),
     timestamp: new Date(),
   });
+});
+
+let isSeeded = false;
+const ensureDatabase = async () => {
+  await connectDB();
+  if (!isSeeded) {
+    try {
+      const skillCount = await Skill.countDocuments();
+      if (skillCount === 0) {
+        await seedDatabase();
+      }
+    } catch (_) {}
+    isSeeded = true;
+  }
+};
+
+// Ensure database connection middleware for serverless / Vercel execution
+app.use(async (req, res, next) => {
+  try {
+    await ensureDatabase();
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Mount modular API Routes
@@ -91,6 +115,9 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Start Server if running directly (standalone / local dev)
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 module.exports = app;
